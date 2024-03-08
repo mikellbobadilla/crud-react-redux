@@ -1,4 +1,9 @@
+import { useAppSelector } from "../hooks/store";
+import { EditIcon } from "./icons/EditIcon";
+import { TrashIcon } from "./icons/TrashIcon";
+
 import {
+	Badge,
 	Card,
 	Table,
 	TableBody,
@@ -6,59 +11,60 @@ import {
 	TableHead,
 	TableHeaderCell,
 	TableRow,
+	Title,
 } from "@tremor/react";
 
-const users: {
-	id: string;
-	name: string;
-	email: string;
-	github: string;
-}[] = [
-	{
-		id: "1",
-		name: "Yazman Rodriguez",
-		email: "yazman@gmai.com",
-		github: "yazmanito",
-	},
-	{
-		id: "2",
-		name: "Juan Perez",
-		email: "leo@gmail.com",
-		github: "juanito",
-	},
-	{
-		id: "3",
-		name: "Haakon Dahlberg",
-		email: "haakon@gmai.com",
-		github: "haakonito",
-	},
-];
+import { useUserAction } from "../hooks/useUserAction";
 
 export function ListOfUsers() {
+	/* Lectura del store de use reducer toolkit */
+	const users = useAppSelector((state) => state.users);
+	/* Custom hook para usar los dispatch de este slice user */
+	const { removeUser } = useUserAction();
+
 	return (
-		<Card className="rounded-lg">
+		<Card>
+			<Title>
+				Usuarios
+				<Badge className="ml-2">{users.length}</Badge>
+			</Title>
 			<Table>
 				<TableHead>
-					<TableHeaderCell> Id </TableHeaderCell>
-					<TableHeaderCell> Nombre </TableHeaderCell>
-					<TableHeaderCell> Email </TableHeaderCell>
-					<TableHeaderCell> Acciones </TableHeaderCell>
+					<TableRow>
+						<TableHeaderCell> Id </TableHeaderCell>
+						<TableHeaderCell> Nombre </TableHeaderCell>
+						<TableHeaderCell> Email </TableHeaderCell>
+						<TableHeaderCell> Acciones </TableHeaderCell>
+					</TableRow>
 				</TableHead>
 
 				<TableBody>
-					{users.map((user) => (
-						<TableRow key={user.id}>
-							<TableCell>{user.id}</TableCell>
-							<TableCell className="flex items-center">
+					{users.map((item) => (
+						<TableRow key={item.name}>
+							<TableCell>{item.id}</TableCell>
+							<TableCell style={{ display: "flex", alignItems: "center" }}>
 								<img
-									className="size-8 rounded-full mr-2"
-									src={`https://unavatar.io/github/${user.github}`}
-									alt={user.name}
+									style={{
+										width: "32px",
+										height: "32px",
+										borderRadius: "50%",
+										marginRight: "8px",
+									}}
+									src={`https://unavatar.io/github/${item.github}`}
+									alt={item.name}
 								/>
-								{user.name}
+								{item.name}
 							</TableCell>
-							<TableCell>{user.email}</TableCell>
-							<TableCell>Acciones</TableCell>
+							<TableCell>{item.email}</TableCell>
+							<TableCell>
+								<button type="button">
+									<EditIcon />
+								</button>
+
+								<button type="button" onClick={() => removeUser(item.id)}>
+									<TrashIcon />
+								</button>
+							</TableCell>
 						</TableRow>
 					))}
 				</TableBody>
